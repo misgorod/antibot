@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  service:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile
+    environment:
+      ANTIBOT_ZK_HOSTS: zk01:2181,zk02:2181,zk03:2181
+    ports:
+      - 8080:80
+    depends_on:
+      - zk01
+      - zk02
+      - zk03
+  zk01:
+    image: zookeeper:3.5.8
+    restart: always
+    ports:
+      - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zk01:2888:3888;2181 server.2=zk02:2888:3888;2181 server.3=zk03:2888:3888;2181
+      JVMFLAGS: -Dznode.container.checkIntervalMs=1000 -Dzookeeper.extendedTypesEnabled=true
+      ZOO_LOG4J_PROP: TRACE,CONSOLE
+  zk02:
+    image: zookeeper:3.5.8
+    restart: always
+    expose:
+      - 2181
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zk01:2888:3888;2181 server.2=zk02:2888:3888;2181 server.3=zk03:2888:3888;2181
+      JVMFLAGS: -Dznode.container.checkIntervalMs=1000 -Dzookeeper.extendedTypesEnabled=true
+      ZOO_LOG4J_PROP: TRACE,CONSOLE
+  zk03:
+    image: zookeeper:3.5.8
+    restart: always
+    expose:
+      - 2181
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zk01:2888:3888;2181 server.2=zk02:2888:3888;2181 server.3=zk03:2888:3888;2181
+      JVMFLAGS: -Dznode.container.checkIntervalMs=1000 -Dzookeeper.extendedTypesEnabled=true
+      ZOO_LOG4J_PROP: TRACE,CONSOLE
